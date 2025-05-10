@@ -2,21 +2,21 @@ package Graph;
 
 import java.util.LinkedList;
 
-public class Edge<T> {
+public class Edge<V> {
 
-	private Vertex<T> toVertex;
-	private Vertex<T> fromVertex;
+	private Vertex<V> toVertex;
+	private Vertex<V> fromVertex;
 	private Integer intensity;
 	
 	/**
 	 * args contructor
-	 * @param fromVertex - start vertex
-	 * @param toVertex - end vertex 
+	 * @param u - start vertex
+	 * @param v - end vertex 
 	 * @param intensity - density
 	 */
-	public Edge(Vertex<T> fromVertex, Vertex<T> toVertex,Integer intensity) {
-		this.toVertex = toVertex;
-		this.fromVertex = fromVertex;
+	public Edge(Vertex<V> u, Vertex<V> v, Integer intensity) {
+		this.toVertex = v;
+		this.fromVertex = u;
 		this.intensity = intensity;
 	}
 
@@ -24,12 +24,12 @@ public class Edge<T> {
 	 * 
 	 * @return start vertex
 	 */
-	public Vertex<T> getFromVertex() {
+	public Vertex<V> getFromVertex() {
 		return fromVertex;
 	}
 
 	
-	public Vertex<T> getToVertex() {
+	public Vertex<V> getToVertex() {
 		return toVertex;
 	}
 
@@ -40,7 +40,7 @@ public class Edge<T> {
 	 * 
 	 * @param fromVertex - start vertex
 	 */
-	public void setFromVertex(Vertex<T> fromVertex) {
+	public void setFromVertex(Vertex<V> fromVertex) {
 		this.fromVertex = fromVertex;
 	}
 	

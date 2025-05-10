@@ -16,6 +16,7 @@ public class Vertex<T> implements Position<T> , Iterable<T>{
     	 this(null);
      }
      
+     
      /**
       * args constructor
       * @param pixel - pixel at the position

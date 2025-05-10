@@ -14,7 +14,7 @@ public interface IGraph<V, E> {
 	Iterable<Edge<E>> outgoingEdges(Vertex<V> v);
 	Iterable<Edge<E>> incomingEdges(Vertex<V> v);
 	Vertex<V> insertVertex(V x);
-	Edge<E> insertEdge(Vertex<V> u, Vertex<V> v, E x);
+	void insertEdge(Vertex<V> u, Vertex<V> v, Integer x);
 	void removeVertex(Vertex<V> v);
 	void removeEdge(Edge<E> e);
 }

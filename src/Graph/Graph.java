@@ -11,7 +11,6 @@ public class Graph<V, E> implements IGraph<V, E> {
     private int sizeE;
    
     private List<Vertex<V>> vertexList = new ArrayList<>();
-    private Map<Vertex<V>, List<Edge<E>>> adj = new HashMap<>();
 	
     
     public Graph() {
@@ -67,9 +66,9 @@ public class Graph<V, E> implements IGraph<V, E> {
 	}
 
 	@Override
-	public Edge<E> insertEdge(Vertex<V> u, Vertex<V> v, E x) {
-		// TODO Auto-generated method stub
-		return null;
+	public void insertEdge(Vertex<V> u, Vertex<V> v, Integer intensity) {
+		 // use Vertex.setEdge as well for adjacency in vertex
+        u.setEdge(v, intensity);
 	}
 
 	@Override
@@ -104,18 +103,15 @@ public class Graph<V, E> implements IGraph<V, E> {
 
 	@Override
 	public Vertex<V>[] endVertices(Edge<E> e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Vertex<V> insertVertex(V x) {
+	public Vertex<V> insertVertex(V Element) {
 		
-		 Vertex<V> v = new Vertex<>(x);
-	        vertexList.add(v);
-	        adj.put(v, new ArrayList<>());
-	        sizeV++;
-	        return v;
+		Vertex<V> v = new Vertex<>(Element);
+        vertexList.add(v);
+        return v;
 	}
 
 }
