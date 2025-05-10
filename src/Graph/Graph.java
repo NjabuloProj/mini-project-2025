@@ -110,8 +110,12 @@ public class Graph<V, E> implements IGraph<V, E> {
 
 	@Override
 	public Vertex<V> insertVertex(V x) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		 Vertex<V> v = new Vertex<>(x);
+	        vertexList.add(v);
+	        adj.put(v, new ArrayList<>());
+	        sizeV++;
+	        return v;
 	}
 
 }
