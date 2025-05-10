@@ -20,10 +20,10 @@ import javafx.stage.Stage;
 public class MainPane extends GridPane {
     private Button btnUpload;
     private TextField txtStatus;
-    private Label lblOriginal;
-    private Label lblGray; 
     private ImageView imageview;
+    private Label lbLabel;
     private ImageView grayscaleView;
+    private ImageView edgeView;
     private Image img;
 
     public MainPane(Stage stage) {
@@ -32,39 +32,43 @@ public class MainPane extends GridPane {
     }
 
     private void setUpGUI() {
-        // Layout
+        // layout spacing and alignment
         setAlignment(Pos.TOP_CENTER);
         setHgap(20);
         setVgap(20);
 
-        // Controls
+        // controls
         btnUpload = new Button("Upload Image");
         txtStatus = new TextField("No image uploaded");
         txtStatus.setEditable(false);
 
-        
-        lblOriginal = new Label("Figure 1: Original Image");
-        lblGray = new Label("Figure 2: Grayscale Image");
-        // Original image view
+        // original image
         imageview = new ImageView();
-        imageview.setFitWidth(400);
-        imageview.setFitHeight(400);
+        imageview.setFitWidth(300);
+        imageview.setFitHeight(300);
         imageview.setPreserveRatio(true);
 
-        // Grayscale image view
+        lbLabel = new Label();
+        // grayscale image
         grayscaleView = new ImageView();
-        grayscaleView.setFitWidth(400);
-        grayscaleView.setFitHeight(400);
+        grayscaleView.setFitWidth(300);
+        grayscaleView.setFitHeight(300);
         grayscaleView.setPreserveRatio(true);
 
-        // Add to grid: upload row
-        add(btnUpload, 0, 0);
-        add(txtStatus, 1, 0);
-        // Add to grid: images row, side by side
-        add(imageview, 0, 1);
-        add(grayscaleView, 1, 1);
-        add(lblOriginal, 0, 2);
-        add(lblGray, 1, 2);
+        // edge mapping image
+        edgeView = new ImageView();
+        edgeView.setFitWidth(300);
+        edgeView.setFitHeight(300);
+        edgeView.setPreserveRatio(true);
+
+        // add to grid: upload controls
+        add(btnUpload,      0, 0, 1, 1);
+        add(txtStatus,      1, 0, 2, 1);
+        // add to grid: images row
+        add(imageview,      0, 1);
+        add(grayscaleView,  1, 1);
+        add(edgeView,       2, 1);
+        add(lbLabel, 0, 3);
     }
 
     private void uploadImage(Stage stage) {
@@ -80,9 +84,19 @@ public class MainPane extends GridPane {
                     img = new Image(fis);
                     imageview.setImage(img);
 
-                    // Convert to grayscale and show
+                    // 1) Convert to grayscale
                     Image gray = convertToGrayscale(img);
                     grayscaleView.setImage(gray);
+
+                    // 2) Detect edges (edges black on white background)
+                    Image edges = detectEdges(gray, 0.2);
+                    edgeView.setImage(edges);
+                    
+                    AnimalCounter counter = new AnimalCounter(edges);
+                   
+                	int animalCount = counter.countAnimals();
+                	 lbLabel.setText(String.valueOf(animalCount));
+                	System.out.println("Animals detected: " + animalCount);
 
                     txtStatus.setText("Loaded: " + file.getName());
                 } catch (IOException ex) {
@@ -106,10 +120,56 @@ public class MainPane extends GridPane {
                 double lum = 0.2126 * c.getRed()
                            + 0.7152 * c.getGreen()
                            + 0.0722 * c.getBlue();
-                javafx.scene.paint.Color g = new javafx.scene.paint.Color(lum, lum, lum, c.getOpacity());
-                writer.setColor(x, y, g);
+                writer.setColor(x, y,
+                    new javafx.scene.paint.Color(lum, lum, lum, c.getOpacity()));
             }
         }
         return grayImg;
+    }
+
+    private Image detectEdges(Image grayImage, double threshold) {
+        int w = (int) grayImage.getWidth();
+        int h = (int) grayImage.getHeight();
+        WritableImage edgeImg = new WritableImage(w, h);
+        PixelReader reader = grayImage.getPixelReader();
+        PixelWriter writer = edgeImg.getPixelWriter();
+
+        // Sobel kernels
+        int[][] kx = {
+            { -1, 0, 1 },
+            { -2, 0, 2 },
+            { -1, 0, 1 }
+        };
+        int[][] ky = {
+            { -1, -2, -1 },
+            {  0,  0,  0 },
+            {  1,  2,  1 }
+        };
+        double maxMag = Math.sqrt((4*255)*(4*255)*2);
+
+        // initialize background to white
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                writer.setColor(x, y, javafx.scene.paint.Color.WHITE);
+            }
+        }
+
+        for (int y = 1; y < h - 1; y++) {
+            for (int x = 1; x < w - 1; x++) {
+                double gx = 0, gy = 0;
+                for (int j = -1; j <= 1; j++) {
+                    for (int i = -1; i <= 1; i++) {
+                        double lum = reader.getColor(x + i, y + j).getRed() * 255;
+                        gx += kx[j + 1][i + 1] * lum;
+                        gy += ky[j + 1][i + 1] * lum;
+                    }
+                }
+                double mag = Math.hypot(gx, gy) / maxMag;
+                if (mag > threshold) {
+                    writer.setColor(x, y, javafx.scene.paint.Color.BLACK);
+                }
+            }
+        }
+        return edgeImg;
     }
 }

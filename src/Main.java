@@ -23,6 +23,10 @@ public class Main extends Application {
    
     @Override
     public void start(Stage primaryStage) {
+    	
+    	
+
+    	
        MainPane pane = new MainPane(primaryStage);
        Scene scene = new Scene(pane);
        primaryStage.setScene(scene);
